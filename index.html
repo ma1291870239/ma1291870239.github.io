@@ -150,6 +150,274 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-React-Native学习之路二" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/16/React-Native学习之路二/">React Native学习之路二（React Native第三方组件）</a>
+    </h1>
+  
+
+        
+        <a href="/2018/01/16/React-Native学习之路二/" class="archive-article-date">
+  	<time datetime="2018-01-16T10:35:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>   react native虽说已经发展了不短时间，但是官方的组件在我看来还算不上完善，很多功能有各种各样的小问题，而且每次更新有些组件变化很大。使用一些第三方组件可以提高开发效率。<br>  <a href="https://js.coach/" target="_blank" rel="noopener">JS.coach</a> ，<br>  这个应该算是官方推荐的网站，搜索你想找的组件，然后选择搜索框下面react native类别即可。</p>
+<p>  <strong>安装流程</strong><br>    第三方组件都是通过npm来安装的，一般都是需要执行npm install  –save命令来执行安装，完成以后就可以按组件文档来使用，如果需要在原生里面进行配置，还需要执行rnpm link命令。这些流程都需要参照组件说明文档来安装。下面介绍一下我开发用到的组件。</p>
+<p> <strong>react native导航组件：react-navigation </strong><br>    这个算是基础组件了，解决了react native的导航需求，还包含了tab栏的功能，使用分为三种，分别是StackNavigator，TabNavigator，DrawerNavigator。StackNavigator是用来实现返回跳转功能的，TabNavigator相当于tabbar的设置。先介绍下TabNavigator在android与iOS上的默认效果是不一样的，android需要配置一些属性。</p>
+<pre><code>const RootTabs = TabNavigator({
+    Home: {
+      screen: Home,
+      navigationOptions: {
+      tabBarLabel: &apos;Home&apos;,
+      tabBarIcon: ({ tintColor, focused }) =&gt; (
+        &lt;Image
+          source={focused?Home_s:Home_n}
+          style={{
+	            resizeMode:'contain',
+	            width: 20,
+	            height: 20,
+	          }}
+        /&gt;
+      ),},
+    }
+},{
+  tabBarComponent: TabBarBottom,
+  animationEnabled: false,      // 切换页面时不显示动画
+  tabBarPosition: &apos;bottom&apos;,     // 显示在底端，android 默认是显示在页面顶端的
+  swipeEnabled: false,          // 禁止左右滑动
+  backBehavior: &apos;none&apos;,         // 按 back 键是否跳转到第一个 Tab， none 为不跳转
+  tabBarOptions: {
+    activeTintColor: &apos;#0063AE&apos;,       // 文字和图片选中颜色
+    inactiveTintColor: &apos;#A4A4A4&apos;,     // 文字和图片默认颜色
+    showIcon: true,                   // android 默认不显示 icon, 需要设置为 true 才会显示
+    indicatorStyle: {height: 0},      // android 中TabBar下面会显示一条线，高度设为 0 后就不显示线了
+    style: {
+      backgroundColor: &apos;#FFFFFF&apos;,   // TabBar 背景色
+    },
+    labelStyle: {
+      fontSize: 14,                 // 文字大小
+    },
+    iconStyle:{
+    },
+  },
+})
+</code></pre><p>这里算是android基本的基本配置，另外在每个页面可以指定navigation的设置。</p>
+<pre><code>static navigationOptions = ({ navigation, screenProps }) =&gt; ({
+  headerTitle: &apos;Home&apos;,
+  headerStyle: {
+    backgroundColor: &apos;#0063AE&apos;,
+    elevation: 0 //去掉安卓导航条底部阴影
+  },
+  headerTitleStyle: {
+    alignSelf:&apos;center&apos;,
+    color:&apos;#fff&apos;
+  },
+  headerLeft:(
+    &lt;TouchableOpacity&gt;
+      &lt;Text&gt;&lt;/Text&gt;
+    &lt;/TouchableOpacity&gt;
+  ),
+  headerRight:(
+    &lt;TouchableOpacity &gt;
+      &lt;Text&gt;&lt;/Text&gt;
+    &lt;/TouchableOpacity&gt;
+  ),
+});
+</code></pre><p>这里面headerLeft与headerRight，如果只设置一边headerTitle会偏移，所以需要在另一边设置个空的组件。之后就是StackNavigator的跳转与返回。</p>
+<pre><code>const StacksOverTabs = StackNavigator({
+  RootTabs: {
+    screen: RootTabs,
+  },
+  Webview: {
+    screen: Webview,
+  },
+});
+</code></pre><p>这里相当于在StackNavigator注册了一下页面，然后在页面里就可以直接使用跳转返回功能了。返回一般放在左上角，直接使用navigation的goBack方法就可以了。</p>
+<pre><code>//跳转
+const { navigate } = this.props.navigation;
+&lt;TouchableOpacity onPress={() =&gt; navigate(&apos;Webview&apos;)}&gt;
+            &lt;Text style={styles.text}&gt;跳转&lt;/Text&gt;
+&lt;/TouchableOpacity&gt;
+
+//返回
+headerLeft:(
+    &lt;TouchableOpacity onPress={()=&gt;{navigation.goBack()}}&gt;
+      &lt;Image source={backimg} style={{resizeMode:'center', paddingRight:10}}&gt;&lt;/Image&gt;
+    &lt;/TouchableOpacity&gt;
+  ),
+</code></pre><p>关于navigation的具体用法可以参考这篇文章：<br><a href="https://www.jianshu.com/p/2f575cc35780" target="_blank" rel="noopener">react-navigation使用技巧</a> 。</p>
+<p><strong>react native轮播组件：react-native-swiper</strong><br>这个组件就是用来放轮播图的，使用起来也很简单。</p>
+<pre><code>&lt;View style={styles.bannerview}&gt;
+        &lt;Swiper style={styles.wrapper}&gt;
+          &lt;View style={styles.slide}&gt;
+            &lt;TouchableOpacity style={styles.swiperview} onPress={() =&gt; navigate(&apos;Webview&apos;, { url: Url ,})}&gt;
+              &lt;Image
+                style={styles.image}
+                source={require(&apos;../res/Banner1.png&apos;)}
+                resizeMode=&apos;cover&apos;
+              /&gt;
+            &lt;/TouchableOpacity &gt;
+          &lt;/View&gt;
+          &lt;View style={styles.slide}&gt;
+            &lt;TouchableOpacity style={styles.swiperview} onPress={() =&gt; navigate(&apos;Webview&apos;, { url: ElevatorPartsUrl ,})}&gt;
+              &lt;Image
+                style={styles.image}
+                source={require(&apos;../res/Banner2.png&apos;)}
+                resizeMode=&apos;cover&apos;
+              /&gt;
+            &lt;/TouchableOpacity&gt;
+          &lt;/View&gt;
+        &lt;/Swiper&gt;
+      &lt;/View&gt;
+</code></pre><p>我的建议是在外面嵌套一层view使用 ，不然一些图片显示设置可能不起作用。</p>
+<p><strong>react native的标签栏组件：react-native-scrollable-tab-view</strong><br>其实navigation已经满足基本需求了，这个我是用在navigation里面做嵌套的，比较好的一点就是这两个之间没有冲突，至少我是没有遇到。</p>
+<pre><code>&lt;ScrollableTabView
+      tabBarPosition=&apos;top&apos;//设置tabbar在显示方式与位置
+      renderTabBar={() =&gt; &lt;DefaultTabBar /&gt;}
+      tabBarUnderlineStyle={{backgroundColor:'#FF624F'}}//被选中tab下横线颜色
+      tabBarBackgroundColor=&apos;#FFFFFF&apos;//tab栏背景颜色
+      tabBarActiveTextColor=&apos;#FF624F&apos;//被选中tab文字颜色
+      tabBarInactiveTextColor=&apos;#000&apos;//未选中tab文字颜色
+    &gt;
+      &lt;View tabLabel=&apos;Tab-1&apos; style={styles.rootview}&gt;
+        &lt;Text style={styles.loantext1}&gt;tab1的页面&lt;/Text&gt;
+      &lt;/View&gt;
+      &lt;View tabLabel=&apos;Tab-2&apos; style={styles.rootview}&gt;
+        &lt;Text style={styles.loantext1}&gt;tab2的页面&lt;/Text&gt;
+      &lt;/View&gt;
+    &lt;/ScrollableTabView&gt;
+</code></pre><p>可以通过指定renderTabBar来自定义标签栏，具体使用就是</p>
+<pre><code>renderTabBar={() =&gt; &lt;MyTabBar someProp={&apos;tabbar&apos;}
+</code></pre><p>自定义需要实现一些属性才能使用，可以参考这篇文章：<br><a href="https://www.jianshu.com/p/b0cfe7f11ee7" target="_blank" rel="noopener">[React Native]react-native-scrollable-tab-view(进阶篇)</a> 。</p>
+<p><strong>react native的单选组件：react-native-radio-buttons</strong><br>其实有个更流行的react-native-flexi-radio-button，选这个是当时找的时候先发现这个符合要求，用起来也比较简单，包含RadioGroup与RadioButton组件，这里只说RadioButton，单选组件用起来非常的简单。</p>
+<pre><code>options = [
+    &quot;选项1&quot;,
+    &quot;选项2&quot;,
+    &quot;选项3&quot;
+];
+
+setSelectedOption(selectedOption，selectedIndex){
+    this.setState({
+      selectedOption
+    });
+  }
+
+ renderOption(option, selected, onSelect, index){
+  const style = selected ? styles.radiobtnselect : styles.radiobtnnormal;
+    return (
+      &lt;TouchableOpacity onPress={onSelect} key={index}&gt;
+        &lt;Text style={style}&gt;{option}&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    );
+  } 
+
+&lt;RadioButtons
+            options={ this.options }
+            onSelection={ this.setSelectedOption.bind(this) }
+            selectedOption={this.state.selectedOption }
+            renderOption={ this.renderOption}
+            renderContainer={ RadioButtons.getViewContainerRenderer(styles.radiocontainer)}
+          /&gt;
+</code></pre><p>option就是设置单选框文本数据 ，onSelection是选择后的回调方法，selectedIndex与selectedOption都是设置默认选项的，一个是下标一个是选项。renderOption是用来指定未选与选中的样式。renderContainer是必选要指定的，具体可参考git上的说明文档。</p>
+<p><strong>react native拍照选择组件：react-native-image-picker</strong></p>
+<pre><code>var photoOptions = {
+//底部弹出框选项
+  title:&apos;请选择&apos;,
+  cancelButtonTitle:&apos;取消&apos;,
+  takePhotoButtonTitle:&apos;拍照&apos;,
+  chooseFromLibraryButtonTitle:&apos;选择相册&apos;,
+  quality:0.75,
+  allowsEditing:true,
+  noData:false,
+  storageOptions: {
+  skipBackup: true,
+  path:&apos;images&apos;
+  }
+}
+
+cameraAction=()=&gt;{
+ImagePicker.showImagePicker(photoOptions, (response) =&gt; {
+  console.log(&apos;Response = &apos;, response);
+
+  if (response.didCancel) {
+    console.log(&apos;User cancelled image picker&apos;);
+  }
+  else if (response.error) {
+    console.log(&apos;ImagePicker Error: &apos;, response.error);
+  }
+  else if (response.customButton) {
+    console.log(&apos;User tapped custom button: &apos;, response.customButton);
+  }
+  else {
+    let source = { uri: response.uri };
+
+    // You can also display the image using data:
+    // let source = { uri: &apos;data:image/jpeg;base64,&apos; + response.data };
+
+    this.setState({
+      avatarSource: source
+    });
+  }
+});
+}
+
+&lt;ImageBackground source={this.state.avatarSource} style={styles.itemimgback}&gt;
+    &lt;Text style={styles.tiptext} onPress={()=&gt;this.cameraAction()}&gt;+{&apos;\n&apos;}点击拍照&lt;/Text&gt;
+&lt;/ImageBackground&gt;
+</code></pre><p>组件用起来比较容易，目前只是试用了一下，cameraAction里的方法还没有进行测试，所以现在也无法进行说明。</p>
+<p><strong>react native热更新组件</strong><br>热更新组件本来是用的中文网的pushy，但是在5.0上出现so文件报错，在论坛以及git上发现有人提出过一样的问题，但是没得到回复，所以就弃用了，不过pushy用起来比codepush简单，文档也是一目了然。至于codepush就是现在采用的方案，但是微软的文档不仅没有中文，而且说的也不详细，配置起来相当复杂，在此推荐两篇文章：<br><a href="http://blog.csdn.net/u013475663/article/details/70578149" target="_blank" rel="noopener">RN部署热更新学习</a><br><a href="http://blog.csdn.net/smiletomyself/article/details/70739638#%E4%B8%8B%E9%9D%A2%E6%98%AF-codepush-%E9%9B%86%E6%88%90%E8%AF%A6%E8%A7%A3" target="_blank" rel="noopener">ReactNative基于CodePush实现热更新集成详解</a></p>
+<p>以上就是目前项目中用到的组件</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/01/16/React-Native学习之路二/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-React-Native学习之路一" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -171,8 +439,8 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>  随着17年的结束，react-native的项目也暂告一段落了，这次写的项目虽然很简单，但是同样学到了很多东西。相当于把react-native的基础都用了一遍。这里控件介绍不说具体属性与方法，因为这些东西在React Native中文网以及官网已经介绍很清楚了，只说一些用法的思路跟一些想法。组件的使用都要通过import导入。<br>  先介绍一下常用控件：</p>
-<p>  <strong>View</strong><br>  View是一个最基础的组件，按照我的使用习惯，大概相当于android的layout控件，同时View支持Flexbox布局，所以我基本是按照android的Linearlayout来当做父容器使用的，可以嵌套一些其它的组件。react-native的样式基本是类似于CSS的，所以前端写布局可能比较容易，如果像我一样只学过android，用起来有些属性可能会不太熟，因为我当时是边学边写，所以属性参数基本用的比较死板，可能以后看得多了才会好点。顺便提一下，写UI过程中发现有时候需要View包裹才能让一些样式设置生效，不知道是不是我写的问题，所以当遇到样式不生效的时候，可以在外面包裹一层View，说不定就可以了。至于Flexbox布局，我感觉跟android的layout_weight差不多，算是比较好上手的。推荐看一下阮一峰写的文章。<br>  Flexbox布局：<a href="http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html" target="_blank" rel="noopener"> Flexbox布局</a><br>  react-native样式：<a href="http://blog.csdn.net/violetjack0808/article/details/51329554" target="_blank" rel="noopener">react-native样式</a></p>
-<p>  <strong>Text</strong><br>  Text是用来显示文本的组件，支持触摸事件，Text组件是可以嵌套的，嵌套以后默认是父Text的样式，可以另行指定，Text组件一般需求都是设置文字的 ，可以通过textAlign来设置文字位置以及color来设置文字颜色</p>
+<p>  <strong>View</strong><br>  View是一个最基础的组件，按照我的使用习惯，大概相当于android的layout控件，同时View支持Flexbox布局，所以我基本是按照android的Linearlayout来当做父容器使用的，可以嵌套一些其它的组件。react-native的样式基本是类似于CSS的，所以前端写布局可能比较容易，如果像我一样只学过android，用起来有些属性可能会不太熟，因为我当时是边学边写，所以属性参数基本用的比较死板，可能以后看得多了才会好点。顺便提一下，写UI过程中发现有时候需要View包裹才能让一些样式设置生效，不知道是不是我写的问题，所以当遇到样式不生效的时候，可以在外面包裹一层View，说不定就可以了。至于Flexbox布局，我感觉跟android的layout_weight差不多，算是比较好上手的。推荐看一下阮一峰写的文章以及样式属性。<br><a href="http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html" target="_blank" rel="noopener"> Flex 布局教程：语法篇</a><br><a href="http://blog.csdn.net/violetjack0808/article/details/51329554" target="_blank" rel="noopener">React Native常用组件样式总结</a></p>
+<p>  <strong>Text</strong><br>  Text是用来显示文本的组件，支持触摸事件，Text组件是可以嵌套的，嵌套以后默认是父Text的样式，可以另行指定，Text组件一般需求都是设置文字的 ，可以通过textAlign来设置文字位置以及color来设置文字颜色。</p>
 <p><strong>Image</strong><br>    Image是显示图像的组件，我使用的是0.50版本，现在已经不支持嵌套使用了，Image组件显示本地图像都是用require直接导入，require里的目录是不允许拼接的，拼接会报错，但是放在原生以及网络上的图片是需要通过uri导入的。<br>    android本地图片    ：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;Image </span><br><span class="line">source=&#123;&#123;uri:&apos;ic_launcher&apos;&#125; </span><br><span class="line">style=&#123;styles.imgStyle&#125;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
 <p>   网络图片：</p>
